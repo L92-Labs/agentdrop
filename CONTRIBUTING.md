@@ -26,6 +26,8 @@ bash .github/scripts/cloudflare-only.sh
 - Schema changes go in a new migration file. Never edit an applied migration.
 - Write an ADR in `docs/adr/` for a non-trivial design decision, and update
   `docs/PRD.md` when scope changes.
+- Update `docs/API.md` for API changes, and add a line under "Unreleased" in
+  `CHANGELOG.md` for anything users will notice.
 - Cloudflare-only: no AWS, GCP or Azure SDKs. CI rejects them.
 - Never commit secrets, `.dev.vars` or `wrangler.*.local.jsonc`.
 

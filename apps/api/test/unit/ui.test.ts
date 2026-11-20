@@ -255,4 +255,10 @@ describe("ui", () => {
     expect(html).toContain('iframe src="http://localhost/a/art_html/render?s=sec_abc"');
     expect(html).not.toContain("?s=sec_abc/render");
   });
+
+  it("footer links to the source repository", () => {
+    expect(pageLanding("http://localhost", DEFAULT_LIMITS)).toContain(
+      'href="https://github.com/L92-Labs/agentdrop" rel="noopener">source</a>',
+    );
+  });
 });

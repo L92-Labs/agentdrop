@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Self-hosting guide
+    url: https://github.com/L92-Labs/agentdrop/blob/main/docs/SELF_HOSTING.md
+    about: Deploy, custom domain, Access, Turnstile, limits, troubleshooting.

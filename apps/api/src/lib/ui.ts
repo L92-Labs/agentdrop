@@ -64,7 +64,9 @@ export function page(opts: PageOpts): string {
         ${opts.body}
       </div>
     </main>
-    <footer class="footer"><div class="footer-inner">${esc(BRAND.footer)}</div></footer>
+    <footer class="footer"><div class="footer-inner">${esc(BRAND.footer)}${
+      BRAND.sourceUrl ? ` · <a class="footer-link" href="${esc(BRAND.sourceUrl)}" rel="noopener">source</a>` : ""
+    }</div></footer>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite">copied</div>
   <script>
@@ -712,7 +714,7 @@ curl -X POST ${esc(baseUrl)}/api/v1/artifacts \\
       </div>
       <div class="endpoint">
         <span class="endpoint-method">get</span> <span class="endpoint-path">/a/:id</span>
-        <p class="endpoint-desc">Viewer (HTML) or JSON metadata depending on Accept header.</p>
+        <p class="endpoint-desc">Viewer page (HTML). Add ?s=… for secret links.</p>
       </div>
       <div class="endpoint">
         <span class="endpoint-method">get</span> <span class="endpoint-path">/r/:id/:file</span>

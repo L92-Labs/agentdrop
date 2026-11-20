@@ -12,6 +12,8 @@ export const BRAND = {
   description: "Artifact hosting for agent machines",
   /** Small text in the page footer. */
   footer: "artifact host · one token per machine",
+  /** "Source" link in the footer (MIT credit welcome, not required). "" hides it. */
+  sourceUrl: "https://github.com/L92-Labs/agentdrop",
   /** Landing page hero. */
   heroTitle: "Files from your agents, hosted properly.",
   heroLead:

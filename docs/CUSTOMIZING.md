@@ -4,7 +4,7 @@
 |------|-------|--------------------|
 | Limits, retention, rate limits | Worker variables (see the [README](../README.md#configure)) | No |
 | Domain, CORS, Access, Turnstile, enroll token | Worker variables and secrets ([SELF_HOSTING.md](SELF_HOSTING.md)) | No |
-| Name, landing copy, colors, fonts | `apps/api/src/brand.ts` | One file |
+| Name, landing copy, colors, fonts, footer source link | `apps/api/src/brand.ts` | One file |
 | Page layout and styles | `apps/api/src/lib/ui.ts`, `ui-css.ts` | Yes |
 | CLI name | `packages/cli` | Yes |
 
