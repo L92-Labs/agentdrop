@@ -1,0 +1,84 @@
+// Deployment config for your Agentdrop instance — see docs/SELF_HOSTING.md.
+//
+// - No account or resource IDs here: Wrangler picks the account from
+//   `wrangler login` / CLOUDFLARE_ACCOUNT_ID and finds (or, on first deploy,
+//   creates) the D1 database and R2 bucket by name. A first interactive deploy
+//   may write `database_id` back into this file — fine to keep in your fork,
+//   don't send it upstream.
+// - Every var below is optional and can also be changed later in the
+//   dashboard (Worker → Settings → Variables). Secrets: `wrangler secret put`.
+// - Private config outside git: copy to wrangler.<name>.local.jsonc
+//   (gitignored) and run `WRANGLER_CONFIG=wrangler.<name>.local.jsonc pnpm run deploy`.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agentdrop",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-12-01",
+  "observability": { "enabled": true },
+  // Daily cleanup of expired artifacts.
+  "triggers": { "crons": ["0 4 * * *"] },
+
+  // CHANGE ME: serve on your own hostname (the zone must be on Cloudflare).
+  // "routes": [{ "pattern": "drop.example.com", "custom_domain": true }],
+  // Set to false once a custom domain is live; *.workers.dev has no Access in front.
+  "workers_dev": true,
+
+  "vars": {
+    // Public origin used in returned links, e.g. "https://drop.example.com".
+    // Empty = the origin each request arrives on (fine for *.workers.dev).
+    "PUBLIC_BASE_URL": "",
+    // Browser origins allowed to call the API, comma-separated, or "*".
+    "CORS_ORIGINS": "*",
+
+    // ── Limits (0 = unlimited where noted) ──────────────────────────────
+    "MAX_FILE_MB": "100",            // largest single file
+    "MAX_STORAGE_MB": "2048",        // active storage per owner (linked account or unlinked device); 0 = unlimited
+    "MAX_ARTIFACTS": "1000",         // active files per owner; 0 = unlimited
+    "MAX_TOTAL_STORAGE_MB": "0",     // active storage for the whole instance; 0 = unlimited
+    "RETENTION_DAYS": "7",           // default expiry, unlinked devices
+    "RETENTION_DAYS_LINKED": "30",   // default expiry, linked devices
+    "MAX_RETENTION_DAYS": "365",     // longest expiry a linked device may choose
+    "UPLOADS_PER_HOUR": "5",         // new devices; 0 = must verify (Turnstile) or link first
+    "UPLOADS_PER_DAY_VERIFIED": "30",
+    "UPLOADS_PER_DAY_LINKED": "200",
+
+    // ── Optional: Turnstile (verified tier). Also: wrangler secret put TURNSTILE_SECRET_KEY
+    "TURNSTILE_SITE_KEY": "",
+
+    // ── Optional: Cloudflare Access (dashboard, device linking, private links).
+    // Both empty = no accounts; secret + password links then work for every device.
+    "CF_ACCESS_TEAM_DOMAIN": "",     // e.g. "https://acme.cloudflareaccess.com"
+    "CF_ACCESS_AUD": ""              // AUD tag(s) of the Access app, comma-separated
+  },
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "agentdrop", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [{ "binding": "DATA", "bucket_name": "agentdrop-data" }],
+
+  "env": {
+    // Used by `pnpm test` (Miniflare, local only). Not a deploy target.
+    "test": {
+      "name": "test-agentdrop-api",
+      "vars": {
+        "CORS_ORIGINS": "*",
+        "PUBLIC_BASE_URL": "http://localhost",
+        "TURNSTILE_SITE_KEY": "test-site-key",
+        "TOKEN_PEPPER": "test-pepper-do-not-use-in-prod",
+        "TURNSTILE_SECRET_KEY": "test-turnstile-secret",
+        "CF_ACCESS_TEAM_DOMAIN": "https://test.cloudflareaccess.com",
+        "CF_ACCESS_AUD": "test-aud",
+        "PAID_EMAILS": "paid@test.com"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "agentdrop-test",
+          "database_id": "00000000-0000-0000-0000-000000000001",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "r2_buckets": [{ "binding": "DATA", "bucket_name": "agentdrop-test-data" }]
+    }
+  }
+}

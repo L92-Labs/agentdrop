@@ -1,0 +1,22 @@
+# deps / build
+node_modules/
+.next/
+.wrangler/
+dist/
+.turbo/
+out/
+build/
+
+# env / secrets
+.env*
+.dev.vars
+
+# private deploy configs (see apps/api/wrangler.jsonc)
+wrangler.*.local.jsonc
+
+# misc
+.DS_Store
+*.log
+.claude/
+coverage/
+**/coverage/

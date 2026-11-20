@@ -1,0 +1,27 @@
+{
+  "name": "agentdrop",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.16.0",
+  "scripts": {
+    "dev": "pnpm --filter agentdrop dev",
+    "dev:api": "pnpm --filter agentdrop dev",
+    "build": "pnpm --filter agentdrop build",
+    "typecheck": "pnpm --filter agentdrop typecheck && pnpm --filter @agentdrop/cli typecheck",
+    "test": "pnpm --filter agentdrop test",
+    "test:coverage": "pnpm --filter agentdrop test:coverage",
+    "test:e2e": "pnpm --filter agentdrop test:e2e",
+    "test:cli": "pnpm --filter @agentdrop/cli test",
+    "cli:link": "mkdir -p \"$HOME/.local/bin\" && ln -sfn \"$PWD/packages/cli/bin/agentdrop.js\" \"$HOME/.local/bin/agentdrop\" && chmod +x \"$PWD/packages/cli/bin/agentdrop.js\" && echo \"linked \u2192 $HOME/.local/bin/agentdrop\"",
+    "deploy": "pnpm --filter agentdrop run deploy"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  },
+  "description": "Self-hosted artifact hosting for AI agents on Cloudflare Workers (R2 + D1).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/L92-Labs/agentdrop.git"
+  }
+}

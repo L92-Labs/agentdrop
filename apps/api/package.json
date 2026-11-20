@@ -1,0 +1,80 @@
+{
+  "name": "agentdrop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler d1 migrations apply DB --local && wrangler dev",
+    "deploy": "bash scripts/deploy.sh",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:e2e": "E2E_LIVE=1 vitest run --config vitest.e2e.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local"
+  },
+  "dependencies": {
+    "hono": "4.12.31"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.12.6",
+    "@cloudflare/workers-types": "5.20260721.1",
+    "@vitest/coverage-istanbul": "3.2.4",
+    "typescript": "6.0.3",
+    "vitest": "3.2.4",
+    "wrangler": "4.113.0"
+  },
+  "description": "Self-hosted artifact hosting for AI agents on Cloudflare Workers",
+  "cloudflare": {
+    "bindings": {
+      "TOKEN_PEPPER": {
+        "description": "Required secret used to hash device tokens and sign password cookies. Generate one with `openssl rand -hex 32` and **never change it** after launch."
+      },
+      "PUBLIC_BASE_URL": {
+        "description": "Public URL of this instance, e.g. `https://drop.example.com`. Leave empty to use the URL each request arrives on."
+      },
+      "CORS_ORIGINS": {
+        "description": "Browser origins allowed to call the API, comma-separated, or `*`."
+      },
+      "MAX_FILE_MB": {
+        "description": "Largest file a device may upload, in MB."
+      },
+      "MAX_STORAGE_MB": {
+        "description": "Active storage per owner (a linked account, or an unlinked device), in MB. `0` = unlimited."
+      },
+      "MAX_ARTIFACTS": {
+        "description": "Active files per owner. `0` = unlimited."
+      },
+      "MAX_TOTAL_STORAGE_MB": {
+        "description": "Active storage for the whole instance, in MB. `0` = unlimited."
+      },
+      "RETENTION_DAYS": {
+        "description": "Days an upload from an unlinked device is kept."
+      },
+      "RETENTION_DAYS_LINKED": {
+        "description": "Default days an upload from a linked device is kept."
+      },
+      "MAX_RETENTION_DAYS": {
+        "description": "Longest expiry a linked device may choose, in days."
+      },
+      "UPLOADS_PER_HOUR": {
+        "description": "Uploads per hour for a new device. `0` = new devices cannot upload until verified or linked."
+      },
+      "UPLOADS_PER_DAY_VERIFIED": {
+        "description": "Uploads per day after the device passes Turnstile."
+      },
+      "UPLOADS_PER_DAY_LINKED": {
+        "description": "Uploads per day for a device linked to an account."
+      },
+      "TURNSTILE_SITE_KEY": {
+        "description": "Optional [Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile) site key. Also set the `TURNSTILE_SECRET_KEY` secret."
+      },
+      "CF_ACCESS_TEAM_DOMAIN": {
+        "description": "Optional: your Cloudflare Access team domain, e.g. `https://acme.cloudflareaccess.com`. Enables the dashboard and device linking."
+      },
+      "CF_ACCESS_AUD": {
+        "description": "Optional: Audience (AUD) tag of the Access application that protects `/dashboard` and `/link`."
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+name: ci
+
+# check: typecheck + tests + dependency allowlist on every push and PR.
+# deploy: on push to main, after check passes. Skipped (green) until the
+# repository has these secrets:
+#   CLOUDFLARE_API_TOKEN   Workers Scripts, D1, Workers R2 Storage: Edit
+#                          (+ Zone → Workers Routes: Edit for a custom domain)
+#   CLOUDFLARE_ACCOUNT_ID  target account
+# Optional secret:  WRANGLER_CONFIG  full wrangler.jsonc for your instance
+# Optional variable: E2E_BASE_URL    public URL to smoke-test after deploying
+# TOKEN_PEPPER is a Worker secret, not a CI secret: set it once with
+# `wrangler secret put TOKEN_PEPPER` (the Worker answers 503 until you do).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm test:cli
+      - name: Cloudflare-only dependency allowlist
+        run: bash .github/scripts/cloudflare-only.sh
+
+  deploy:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - name: Skip when Cloudflare secrets are not configured
+        id: gate
+        env:
+          HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          if [ "$HAS_TOKEN" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set; skipping deploy."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.gate.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+      - if: steps.gate.outputs.enabled == 'true'
+        uses: jdx/mise-action@v2
+      - if: steps.gate.outputs.enabled == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Write private wrangler config
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          WRANGLER_CONFIG_BODY: ${{ secrets.WRANGLER_CONFIG }}
+        run: |
+          if [ -n "$WRANGLER_CONFIG_BODY" ]; then
+            printf '%s\n' "$WRANGLER_CONFIG_BODY" > apps/api/wrangler.ci.local.jsonc
+            echo "WRANGLER_CONFIG=wrangler.ci.local.jsonc" >> "$GITHUB_ENV"
+          fi
+      - name: Deploy
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm run deploy
+      - name: Live smoke test
+        if: steps.gate.outputs.enabled == 'true' && vars.E2E_BASE_URL != ''
+        env:
+          E2E_LIVE: "1"
+          E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+        run: pnpm test:e2e

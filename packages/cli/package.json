@@ -1,0 +1,13 @@
+{
+  "name": "@agentdrop/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "agentdrop": "./bin/agentdrop.js"
+  },
+  "scripts": {
+    "typecheck": "node --check bin/agentdrop.js",
+    "test": "node --test test/cli.test.js"
+  }
+}
