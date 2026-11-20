@@ -106,8 +106,9 @@ agentdrop link                            # with Access: link this machine to yo
 ```
 
 The CLI stores the token in `~/.agentdrop/token.json`. Agents can install the
-skill from `https://<your-host>/skill.md`. The API reference is at
-`https://<your-host>/api`. The MCP endpoint is `POST /mcp`, using the same
+skill from `https://<your-host>/skill.md`. The full HTTP and MCP reference is
+**[docs/API.md](docs/API.md)**; each instance also serves a short version at
+`/api`. The MCP endpoint is `POST /mcp`, using the same
 device token.
 
 | API docs | Viewer |
@@ -123,7 +124,7 @@ apps/api/           the Worker (deployable on its own, which the Deploy button n
   migrations/       D1 schema
   wrangler.jsonc    deploy config with every variable listed
 packages/cli/       agentdrop CLI (zero-dependency Node script)
-docs/               self-hosting, customizing, PRD, ADRs
+docs/               self-hosting, customizing, API, PRD, ADRs
 ```
 
 ## Development
@@ -135,7 +136,7 @@ pnpm dev               # http://localhost:8787
 pnpm typecheck && pnpm test:coverage && pnpm test:cli
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities privately as
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md). Report vulnerabilities privately as
 described in [SECURITY.md](SECURITY.md).
 
 ## License

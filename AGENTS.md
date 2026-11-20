@@ -30,7 +30,7 @@ apps/api/src/lib/*         access, device, upload, ui, skill, …
 apps/api/migrations/       D1 schema (append-only)
 apps/api/wrangler.jsonc    generic deploy template (+ env.test for vitest)
 packages/cli/              agentdrop CLI
-docs/                      SELF_HOSTING, CUSTOMIZING, PRD, adr/
+docs/                      SELF_HOSTING, CUSTOMIZING, API, PRD, adr/
 ```
 
 ## Commands
@@ -48,3 +48,4 @@ pnpm run deploy          # migrate + deploy (WRANGLER_CONFIG=… for private con
 3. Add or adjust tests for every change in behavior. Coverage thresholds only go up.
 4. Put schema changes in a new migration. Never edit an applied migration.
 5. Use the structured logger (`src/logger.ts`) and include `requestId`.
+6. Keep `docs/API.md` and `CHANGELOG.md` (Unreleased) current with every user-visible change.

@@ -602,6 +602,8 @@ h1 {
   margin: 0 auto;
   padding: 1.5rem var(--gutter);
 }
+.footer-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.footer-link:hover { color: var(--accent); }
 
 .toast {
   position: fixed; bottom: 1.5rem; left: 50%;
