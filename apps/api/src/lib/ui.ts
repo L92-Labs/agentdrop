@@ -272,6 +272,19 @@ export function mimeLabel(mime: string): string {
   return labels[k] ?? "file";
 }
 
+/** `/a/:id` (+ optional `?s=`) → `/a/:id/render` with query preserved. */
+export function htmlRenderUrl(viewUrl: string): string {
+  try {
+    const u = new URL(viewUrl);
+    u.pathname = `${u.pathname.replace(/\/$/, "")}/render`;
+    return u.toString();
+  } catch {
+    const q = viewUrl.indexOf("?");
+    if (q === -1) return `${viewUrl.replace(/\/$/, "")}/render`;
+    return `${viewUrl.slice(0, q).replace(/\/$/, "")}/render${viewUrl.slice(q)}`;
+  }
+}
+
 export function visibilityBadge(v: string): string {
   const cls =
     v === "private" ? "badge-private" : v === "secret" ? "badge-private" : "badge-public";
@@ -494,7 +507,7 @@ export function pageViewer(opts: {
   } else if (k === "pdf") {
     stage = `<iframe src="${esc(rawUrl)}" title="${esc(title)}"></iframe>`;
   } else if (k === "html") {
-    stage = `<iframe src="${esc(viewUrl)}/render" sandbox="" title="${esc(title)}"></iframe>`;
+    stage = `<iframe src="${esc(htmlRenderUrl(viewUrl))}" sandbox="" title="${esc(title)}"></iframe>`;
   } else if (k === "markdown" && markdownHtml) {
     stage = markdownHtml;
   } else if (k === "text" || k === "markdown") {

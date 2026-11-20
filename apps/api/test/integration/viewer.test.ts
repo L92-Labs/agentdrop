@@ -57,6 +57,42 @@ describe("viewer routes", () => {
     expect(await res.text()).toContain("<h1>hi</h1>");
   });
 
+  it("secret HTML viewer iframe points at /render?s=… and loads", async () => {
+    const { token } = await initDevice();
+    const start = await api("/api/v1/link/start", { method: "POST", token });
+    const { link_code } = (await start.json()) as { link_code: string };
+    const jwt = await fakeAccessJwt("html-secret-owner", "html-secret@test.com");
+    await api(`/link/${link_code}`, { method: "POST", accessJwt: jwt });
+
+    const form = new FormData();
+    form.append(
+      "file",
+      new File([new TextEncoder().encode("<p>secret-html</p>")], "secret.html", {
+        type: "text/html",
+      }),
+    );
+    form.append("visibility", "secret");
+    const up = await api("/api/v1/artifacts", { method: "POST", token, body: form });
+    expect(up.status).toBe(200);
+    const { id, share_token, url } = (await up.json()) as {
+      id: string;
+      share_token: string;
+      url: string;
+    };
+
+    const viewer = await api(`${new URL(url).pathname}${new URL(url).search}`, {
+      headers: { Accept: "text/html" },
+    });
+    expect(viewer.status).toBe(200);
+    const html = await viewer.text();
+    expect(html).toContain(`/a/${id}/render?s=${share_token}`);
+    expect(html).not.toContain(`?s=${share_token}/render`);
+
+    const render = await api(`/a/${id}/render?s=${share_token}`);
+    expect(render.status).toBe(200);
+    expect(await render.text()).toContain("secret-html");
+  });
+
   it("renders markdown with absolute image urls", async () => {
     const { token } = await initDevice();
     const md = "# Hello\n\n![x](https://example.com/a.png)\n";

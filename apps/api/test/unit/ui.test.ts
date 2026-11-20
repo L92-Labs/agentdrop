@@ -2,6 +2,7 @@ import { DEFAULT_LIMITS } from "../../src/limits";
 import { describe, expect, it } from "vitest";
 import {
   esc,
+  htmlRenderUrl,
   mimeKind,
   mimeLabel,
   page,
@@ -32,6 +33,7 @@ describe("ui", () => {
     expect(mimeKind("audio/mpeg")).toBe("audio");
     expect(mimeKind("application/json")).toBe("text");
     expect(mimeKind("text/markdown")).toBe("markdown");
+    expect(mimeKind("text/html")).toBe("html");
   });
 
   it("mimeLabel returns short codes", () => {
@@ -230,5 +232,27 @@ describe("ui", () => {
       'class="viewer-stage viewer-stage-doc"',
     );
     expect(viewer("text/markdown")).toContain('<div class="viewer-stage">');
+  });
+
+  it("htmlRenderUrl inserts /render before query string", () => {
+    expect(htmlRenderUrl("http://localhost/a/art_xyz")).toBe("http://localhost/a/art_xyz/render");
+    expect(htmlRenderUrl("http://localhost/a/art_xyz?s=sec_abc")).toBe(
+      "http://localhost/a/art_xyz/render?s=sec_abc",
+    );
+  });
+
+  it("pageViewer HTML iframe keeps secret token on /render", () => {
+    const html = pageViewer({
+      id: "art_html",
+      title: "page",
+      filename: "page.html",
+      mime: "text/html",
+      viewUrl: "http://localhost/a/art_html?s=sec_abc",
+      rawUrl: "http://localhost/r/art_html/page.html?s=sec_abc",
+      visibility: "secret",
+      expiresAt: new Date().toISOString(),
+    });
+    expect(html).toContain('iframe src="http://localhost/a/art_html/render?s=sec_abc"');
+    expect(html).not.toContain("?s=sec_abc/render");
   });
 });
