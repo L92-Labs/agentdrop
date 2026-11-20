@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow [SemVer](https://semver.org
 
 ## Unreleased
 
+## 1.0.1 (2026-11-20)
+
 ### Fixed
 - Viewer: HTML artifacts shared through secret links no longer return 403 in the iframe.
 - `/api` page: no longer claims that `/a/:id` returns JSON.
